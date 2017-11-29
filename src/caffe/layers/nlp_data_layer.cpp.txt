@@ -146,12 +146,34 @@ void NlpDataLayer<Dtype>::ShuffleImages() {
 
 template <typename Dtype>
 void NlpDataLayer<Dtype>::crop(string path,Dtype* data_out){
-  std::ifstream fin(path.c_str(), ios::binary);
+  cv::Mat img(crop_height_,crop_width_,CV_32FC1,1);
+  std::ifstream fin(path.c_str());
   //LOG(INFO)<<path;
   if(!fin){
     LOG(FATAL) <<path<<" data failed to read!";
   }
-  fin.read((char*)data_out,sizeof(Dtype)*100*300);
+  int count = 0;
+  int wordcount = 0;
+  for (int i  = 0;i<crop_height_;i++)
+  {
+    for(int j = 0;j<crop_width_;j++)
+    {
+      float tmp;
+      if(fin>>tmp)
+      {
+        data_out[count] = tmp;
+        wordcount++;
+      }
+      else
+      {
+        CHECK_GT(count,0)<<"count must be greater than 0"<<path;
+        data_out[count] = data_out[count%wordcount];
+      }
+      count++;
+
+      //LOG(INFO)<<img.at<float>(i,j);
+    }
+  }
   fin.close();
  }
 // This function is called on prefetch thread
