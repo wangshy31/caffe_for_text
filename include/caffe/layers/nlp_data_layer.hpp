@@ -40,7 +40,7 @@ class NlpDataLayer : public BasePrefetchingDataLayer<Dtype> {
   virtual void ShuffleImages();
   virtual void load_batch(Batch<Dtype>* batch);
 
-  void crop(string, Dtype *);
+  void crop(string, Dtype *, int crop_height_, int crop_width_);
   struct nlpinfo{
     int label;
     string filename;

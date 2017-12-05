@@ -145,13 +145,16 @@ void NlpDataLayer<Dtype>::ShuffleImages() {
 }
 
 template <typename Dtype>
-void NlpDataLayer<Dtype>::crop(string path,Dtype* data_out){
+void NlpDataLayer<Dtype>::crop(string path,Dtype* data_out, int crop_height_, int crop_width_){
   std::ifstream fin(path.c_str(), ios::binary);
   //LOG(INFO)<<path;
   if(!fin){
     LOG(FATAL) <<path<<" data failed to read!";
   }
-  fin.read((char*)data_out,sizeof(Dtype)*100*300);
+  fin.read((char*)data_out,sizeof(Dtype)*crop_height_* crop_width_);
+  //for (int i=0;i<100;i++){
+    //LOG(INFO)<<data_out[i*300];
+  //}
   fin.close();
  }
 // This function is called on prefetch thread
@@ -167,7 +170,7 @@ void NlpDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
   for (int item_id = 0; item_id < batch_size_; ++item_id) {
     // get a blob
        //for (int i = 0; i < batch_size_ / Caffe::getThreadNum(); ++i){
-         crop(nlp_info_[current_row_].filename, data_ptr_ + item_id*data_count);
+         crop(nlp_info_[current_row_].filename, data_ptr_ + item_id*data_count, crop_height_, crop_width_);
          label_ptr_[item_id] = nlp_info_[current_row_].label;
          //LOG(INFO)<<nlp_info_[current_row_].filename<<" "<<nlp_info_[current_row_].label;
          current_row_ ++;
