@@ -395,6 +395,7 @@ message LayerParameter {
   optional TileParameter tile_param = 138;
   optional WindowDataParameter window_data_param = 129;
   optional NlpDataParameter nlp_data_param = 147;
+  optional DicDataParameter dic_data_param = 148;
 }
 
 // Message that stores parameters used to apply transformation
@@ -751,6 +752,17 @@ message NlpDataParameter {
   optional uint32 crop_height = 13;
   optional uint32 crop_width = 14;
   optional bool shuffle = 18 [default = true];
+}
+//add by wangshy 20171205
+message DicDataParameter {
+  optional string label_source = 1;
+  optional string data_source = 2;
+  optional string dic_source = 3;
+  optional uint32 batch_size = 4;
+  optional uint32 channel = 5;
+  optional uint32 crop_height = 6;
+  optional uint32 crop_width = 7;
+  optional bool shuffle = 8 [default = true];
 }
 message ImageDataParameter {
   // Specify the data source.
