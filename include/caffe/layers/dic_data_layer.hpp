@@ -41,7 +41,8 @@ class DicDataLayer : public BasePrefetchingDataLayer<Dtype> {
   virtual void ShuffleText();
   virtual void load_batch(Batch<Dtype>* batch);
 
-  void crop(string, Dtype *, int crop_height_, int crop_width_);
+  //void crop(string, Dtype *, int crop_height_, int crop_width_);
+  void crop(string, Dtype *);
   struct textinfo{
     int label;
     string content;
@@ -51,7 +52,7 @@ class DicDataLayer : public BasePrefetchingDataLayer<Dtype> {
   int data_count;
 
   size_t batch_size_;
-  int channel_, crop_height_, crop_width_;
+  int num_words_, channel_, crop_height_, crop_width_;
   bool shuffle_;
 
   vector<Dtype> vec_dic;

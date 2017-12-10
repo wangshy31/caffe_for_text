@@ -760,9 +760,10 @@ message DicDataParameter {
   optional string dic_source = 3;
   optional uint32 batch_size = 4;
   optional uint32 channel = 5;
-  optional uint32 crop_height = 6;
-  optional uint32 crop_width = 7;
-  optional bool shuffle = 8 [default = true];
+  optional uint32 num_words = 6;
+  optional uint32 crop_height = 7;
+  optional uint32 crop_width = 8;
+  optional bool shuffle = 9 [default = true];
 }
 message ImageDataParameter {
   // Specify the data source.

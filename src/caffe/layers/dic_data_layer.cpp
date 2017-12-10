@@ -42,7 +42,14 @@ void DicDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
   else{
       LOG(FATAL)<<"DicDataLayer: crop_height crop_width error!";
   }
+if (param.has_num_words()){
+      num_words_ = param.num_words();
+  }
+  else{
+      LOG(FATAL)<<"DicDataLayer: num_words_ error!";
+  }
   CHECK_EQ(crop_width_, 300)<<"crop_width_ should be equal to 300.";
+  CHECK_GE(num_words_, crop_height_)<<"num_words should be greater or equal to crop_height_.";
 
   batch_size_ = param.batch_size();
   channel_ = param.channel();
@@ -131,7 +138,8 @@ void DicDataLayer<Dtype>::ShuffleText() {
 }
 
 template <typename Dtype>
-void DicDataLayer<Dtype>::crop(string content, Dtype* data_out, int crop_height_, int crop_width_){
+void DicDataLayer<Dtype>::crop(string content, Dtype* data_out){
+  Dtype *org_data = new Dtype[num_words_*crop_width_];
   if (content.empty())
     caffe_set(crop_height_*crop_width_, Dtype(0), data_out);
   else{
@@ -140,22 +148,27 @@ void DicDataLayer<Dtype>::crop(string content, Dtype* data_out, int crop_height_
     int count = 0;
     int index = 0;
     while (istr>>index){
-      if (count<crop_height_){
-        //caffe_copy(crop_width_, &vec_dic[0*crop_width_], data_out+count*crop_width_);
-        memcpy(data_out+count*crop_width_, &vec_dic[index*crop_width_], sizeof(Dtype) * crop_width_);
-        //LOG(INFO)<<"index!!!!"<<index<<" "<<data_out[count*crop_width_];
+      if (count<num_words_){
+        memcpy(org_data+count*crop_width_, &vec_dic[index*crop_width_], sizeof(Dtype) * crop_width_);
         count++;
       }
       else
         break;
     }
-    for(int i=count;i<crop_height_;i++)
+    for(int i=count;i<num_words_;i++)
     {
-      //caffe_copy(crop_width_, data_out+i%count*crop_width_, data_out+i*crop_width_);
-      memcpy(data_out+i*crop_width_, data_out+i%count*crop_width_, sizeof(Dtype) * crop_width_);
-      //LOG(INFO)<<"index!!!!"<<data_out[i*crop_width_];
+      memcpy(org_data+i*crop_width_, org_data+i%count*crop_width_, sizeof(Dtype) * crop_width_);
     }
   }
+  if (this->phase_ == TRAIN) {
+    caffe::rng_t* rng_seed =
+      static_cast<caffe::rng_t*>(prefetch_rng_->generator());
+    int h_off = (*rng_seed)() % (num_words_ - crop_height_);
+    memcpy(data_out, org_data+h_off*crop_width_, sizeof(Dtype)*crop_height_*crop_width_);
+  }
+  else
+      memcpy(data_out, org_data, sizeof(Dtype)*crop_height_*crop_width_);
+  delete org_data;
 
 }
 // This function is called on prefetch thread
@@ -167,7 +180,7 @@ void DicDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
   Dtype *label_ptr_ = batch->label_.mutable_cpu_data();
   Dtype *data_ptr_ = batch->data_.mutable_cpu_data();
   for (int item_id = 0; item_id < batch_size_; ++item_id) {
-         crop(text_info_[current_row_].content, data_ptr_ + item_id*data_count, crop_height_, crop_width_);
+         crop(text_info_[current_row_].content, data_ptr_ + item_id*data_count);
          label_ptr_[item_id] = text_info_[current_row_].label;
          current_row_ ++;
          if(current_row_ >= text_info_.size()){
