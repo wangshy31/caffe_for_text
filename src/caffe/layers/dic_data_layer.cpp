@@ -42,12 +42,16 @@ void DicDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
   else{
       LOG(FATAL)<<"DicDataLayer: crop_height crop_width error!";
   }
-if (param.has_num_words()){
+  if (param.has_num_words()){
       num_words_ = param.num_words();
   }
   else{
       LOG(FATAL)<<"DicDataLayer: num_words_ error!";
   }
+  if (param.has_flip())
+    flip_ = param.flip();
+  else
+    flip_ = false;
   CHECK_EQ(crop_width_, 300)<<"crop_width_ should be equal to 300.";
   CHECK_GE(num_words_, crop_height_)<<"num_words should be greater or equal to crop_height_.";
 
@@ -141,7 +145,7 @@ template <typename Dtype>
 void DicDataLayer<Dtype>::crop(string content, Dtype* data_out){
   Dtype *org_data = new Dtype[num_words_*crop_width_];
   if (content.empty())
-    caffe_set(crop_height_*crop_width_, Dtype(0), data_out);
+    caffe_set(channel_*crop_height_*crop_width_, Dtype(0), data_out);
   else{
     std::istringstream istr;
     istr.str(content);
@@ -168,13 +172,22 @@ void DicDataLayer<Dtype>::crop(string content, Dtype* data_out){
   }
   else
       memcpy(data_out, org_data, sizeof(Dtype)*crop_height_*crop_width_);
+
+  if (flip_){
+    //Dtype *flip_data = new Dtype[crop_height_*crop_width_];
+    for (int i = 0;i<crop_height_;i++)
+      memcpy(data_out  + (i+crop_height_)* crop_width_, data_out+(crop_height_ - 1 - i)*crop_width_, sizeof(Dtype)*crop_width_);
+      //memcpy(flip_data + i* crop_width_, data_out+(crop_height_ - 1 - i)*crop_width_, sizeof(Dtype)*crop_width_);
+    //memcpy(data_out, flip_data, sizeof(Dtype)*crop_height_*crop_width_);
+    //delete flip_data;
+  }
   delete org_data;
 
 }
 // This function is called on prefetch thread
 template <typename Dtype>
 void DicDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
-  batch->data_.Reshape(batch_size_, 1, crop_height_, crop_width_);
+  batch->data_.Reshape(batch_size_, channel_, crop_height_, crop_width_);
   vector<int> label_shape(1, batch_size_);
   batch->label_.Reshape(label_shape);
   Dtype *label_ptr_ = batch->label_.mutable_cpu_data();

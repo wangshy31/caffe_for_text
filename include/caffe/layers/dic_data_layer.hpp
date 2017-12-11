@@ -54,6 +54,7 @@ class DicDataLayer : public BasePrefetchingDataLayer<Dtype> {
   size_t batch_size_;
   int num_words_, channel_, crop_height_, crop_width_;
   bool shuffle_;
+  bool flip_;
 
   vector<Dtype> vec_dic;
 };

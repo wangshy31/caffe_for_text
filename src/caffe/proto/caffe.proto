@@ -763,7 +763,8 @@ message DicDataParameter {
   optional uint32 num_words = 6;
   optional uint32 crop_height = 7;
   optional uint32 crop_width = 8;
-  optional bool shuffle = 9 [default = true];
+  optional bool flip = 9 [default = false];
+  optional bool shuffle = 10 [default = true];
 }
 message ImageDataParameter {
   // Specify the data source.
