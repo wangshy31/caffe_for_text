@@ -396,6 +396,8 @@ message LayerParameter {
   optional WindowDataParameter window_data_param = 129;
   optional NlpDataParameter nlp_data_param = 147;
   optional DicDataParameter dic_data_param = 148;
+  optional DictIndexDataParameter dictindex_data_param = 149;
+  optional DictEmbedParameter dict_embed_param = 150;
 }
 
 // Message that stores parameters used to apply transformation
@@ -765,6 +767,26 @@ message DicDataParameter {
   optional uint32 crop_width = 8;
   optional bool flip = 9 [default = false];
   optional bool shuffle = 10 [default = true];
+}
+//add by wangshy 20171212
+message DictIndexDataParameter {
+  optional string label_source = 1;
+  optional string data_source = 2;
+  optional uint32 batch_size = 3;
+  optional uint32 channel = 4;
+  optional uint32 crop_height = 5;
+  optional uint32 crop_width = 6;
+  optional bool shuffle = 7 [default = true];
+}
+//add by wangshy 20171212
+message DictEmbedParameter {
+  optional uint32 num_output = 1; // The number of outputs for the layer
+  optional uint32 input_dim = 2;
+
+  optional bool bias_term = 3 [default = true]; // Whether to use a bias term
+  optional FillerParameter weight_filler = 4; // The filler for the weight
+  optional FillerParameter bias_filler = 5; // The filler for the bias
+  optional string dic_source = 6;
 }
 message ImageDataParameter {
   // Specify the data source.
