@@ -398,6 +398,7 @@ message LayerParameter {
   optional DicDataParameter dic_data_param = 148;
   optional DictIndexDataParameter dictindex_data_param = 149;
   optional DictEmbedParameter dict_embed_param = 150;
+  optional PermuteParameter permute_param = 151;
 }
 
 // Message that stores parameters used to apply transformation
@@ -787,6 +788,13 @@ message DictEmbedParameter {
   optional FillerParameter weight_filler = 4; // The filler for the weight
   optional FillerParameter bias_filler = 5; // The filler for the bias
   optional string dic_source = 6;
+}
+//copy from https://github.com/BVLC/caffe/commit/b68695db42aa79e874296071927536363fe1efbf
+message PermuteParameter {
+  // The new orders of the axes of data. Notice it should be with
+  // in the same range as the input data, and it starts from 0.
+  // Do not provide repeated order.
+  repeated uint32 order = 1;
 }
 message ImageDataParameter {
   // Specify the data source.
