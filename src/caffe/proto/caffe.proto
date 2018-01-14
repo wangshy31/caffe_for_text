@@ -399,6 +399,7 @@ message LayerParameter {
   optional DictIndexDataParameter dictindex_data_param = 149;
   optional DictEmbedParameter dict_embed_param = 150;
   optional PermuteParameter permute_param = 151;
+  optional CropParameter crop_param = 152;
 }
 
 // Message that stores parameters used to apply transformation
@@ -788,6 +789,11 @@ message DictEmbedParameter {
   optional FillerParameter weight_filler = 4; // The filler for the weight
   optional FillerParameter bias_filler = 5; // The filler for the bias
   optional string dic_source = 6;
+}
+//copy from https://github.com/BVLC/caffe/commit
+message CropParameter {
+    optional int32 axis = 1 [default = 2];
+    repeated uint32 offset = 2;
 }
 //copy from https://github.com/BVLC/caffe/commit/b68695db42aa79e874296071927536363fe1efbf
 message PermuteParameter {
