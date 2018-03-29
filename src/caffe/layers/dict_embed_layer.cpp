@@ -69,6 +69,7 @@ void DictEmbedLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
   // Figure out the dimensions
   M_ = bottom[0]->count();
   vector<int> top_shape = bottom[0]->shape();
+  //top_shape.pop_back();
   top_shape.push_back(N_);
   top[0]->Reshape(top_shape);
   // Set up the bias multiplier

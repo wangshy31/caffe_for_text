@@ -273,6 +273,7 @@ int test() {
         }
         const std::string& output_name = caffe_net.blob_names()[
             caffe_net.output_blob_indices()[j]];
+        if (i%100==0)
         LOG(INFO) << "Batch " << i << ", " << output_name << " = " << score;
       }
     }
