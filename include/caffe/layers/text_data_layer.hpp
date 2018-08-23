@@ -1,5 +1,5 @@
-#ifndef CAFFE_DIC_DATA_LAYER_HPP_
-#define CAFFE_DIC_DATA_LAYER_HPP_
+#ifndef CAFFE_TEXT_DATA_LAYER_HPP_
+#define CAFFE_TEXT_DATA_LAYER_HPP_
 
 #include <string>
 #include <utility>
@@ -21,19 +21,19 @@ namespace caffe {
  * TODO(dox): thorough documentation for Forward and proto params.
  */
 template <typename Dtype>
-class DicDataLayer : public BasePrefetchingDataLayer<Dtype> {
+class TextDataLayer : public BasePrefetchingDataLayer<Dtype> {
  public:
-  explicit DicDataLayer(const LayerParameter& param)
+  explicit TextDataLayer(const LayerParameter& param)
       : BasePrefetchingDataLayer<Dtype>(param) {}
 
-  virtual ~DicDataLayer();
+  virtual ~TextDataLayer();
   virtual void DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
 
   virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {}
 
-  virtual inline const char* type() const { return "DicData"; }
+  virtual inline const char* type() const { return "TextData"; }
   virtual inline int ExactNumBottomBlobs() const { return 0; }
   virtual inline int ExactNumTopBlobs() const { return 2; }
  protected:
@@ -56,8 +56,8 @@ class DicDataLayer : public BasePrefetchingDataLayer<Dtype> {
   bool shuffle_;
   bool flip_;
 
-  vector<Dtype> vec_dic;
+  vector<Dtype> vec_dict;
 };
 }  // namespace caffe
 
-#endif  // CAFFE_DIC_DATA_LAYER_HPP_
+#endif  // CAFFE_Text_DATA_LAYER_HPP_

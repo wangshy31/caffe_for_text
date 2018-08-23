@@ -15,7 +15,7 @@
 #include "caffe/util/math_functions.hpp"
 #include "caffe/util/rng.hpp"
 #include "caffe/layers/base_data_layer.hpp"
-#include "caffe/layers/dic_data_layer.hpp"
+#include "caffe/layers/text_data_layer.hpp"
 
 #include "opencv2/opencv.hpp"
 
@@ -27,26 +27,26 @@ using std::max;
 
 
 template <typename Dtype>
-DicDataLayer<Dtype>::~DicDataLayer<Dtype>() {
+TextDataLayer<Dtype>::~TextDataLayer<Dtype>() {
   this->StopInternalThread();
 }
 
 template <typename Dtype>
-void DicDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
+void TextDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
-  const DicDataParameter & param = this->layer_param_.dic_data_param();
+  const TextDataParameter & param = this->layer_param_.text_data_param();
   if (param.has_crop_height() && param.has_crop_width()){
       crop_height_ = param.crop_height();
       crop_width_ = param.crop_width();
   }
   else{
-      LOG(FATAL)<<"DicDataLayer: crop_height crop_width error!";
+      LOG(FATAL)<<"TextDataLayer: crop_height crop_width error!";
   }
   if (param.has_num_words()){
       num_words_ = param.num_words();
   }
   else{
-      LOG(FATAL)<<"DicDataLayer: num_words_ error!";
+      LOG(FATAL)<<"TextDataLayer: num_words_ error!";
   }
   if (param.has_flip())
     flip_ = param.flip();
@@ -123,26 +123,26 @@ void DicDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
   }
 
   LOG(INFO)<<"Reading vector dict...";
-  std::ifstream fdic(param.dic_source().c_str());
-  CHECK(fdic != NULL) << "fail to open " << param.dic_source().c_str();
+  std::ifstream fdict(param.dict_source().c_str());
+  CHECK(fdict != NULL) << "fail to open " << param.dict_source().c_str();
   Dtype word;
-  while(fdic>>word)
-    vec_dic.push_back(word);
-  CHECK_EQ(vec_dic.size() % 300, 0)<<"vec_dic.size() % 300 should be equal to 0.";
-  LOG(INFO)<<"vec_dic size: "<<vec_dic.size()/300.0;
+  while(fdict>>word)
+    vec_dict.push_back(word);
+  CHECK_EQ(vec_dict.size() % 300, 0)<<"vec_dict.size() % 300 should be equal to 0.";
+  LOG(INFO)<<"vec_dict size: "<<vec_dict.size()/300.0;
 
 
 }
 
 template <typename Dtype>
-void DicDataLayer<Dtype>::ShuffleText() {
+void TextDataLayer<Dtype>::ShuffleText() {
   caffe::rng_t* prefetch_rng =
       static_cast<caffe::rng_t*>(prefetch_rng_->generator());
   shuffle(text_info_.begin(), text_info_.end(), prefetch_rng);
 }
 
 template <typename Dtype>
-void DicDataLayer<Dtype>::crop(string content, Dtype* data_out){
+void TextDataLayer<Dtype>::crop(string content, Dtype* data_out){
   Dtype *org_data = new Dtype[num_words_*crop_width_];
   if (content.empty())
     caffe_set(channel_*crop_height_*crop_width_, Dtype(0), data_out);
@@ -153,7 +153,7 @@ void DicDataLayer<Dtype>::crop(string content, Dtype* data_out){
     int index = 0;
     while (istr>>index){
       if (count<num_words_){
-        memcpy(org_data+count*crop_width_, &vec_dic[index*crop_width_], sizeof(Dtype) * crop_width_);
+        memcpy(org_data+count*crop_width_, &vec_dict[index*crop_width_], sizeof(Dtype) * crop_width_);
         count++;
       }
       else
@@ -186,7 +186,7 @@ void DicDataLayer<Dtype>::crop(string content, Dtype* data_out){
 }
 // This function is called on prefetch thread
 template <typename Dtype>
-void DicDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
+void TextDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
   batch->data_.Reshape(batch_size_, channel_, crop_height_, crop_width_);
   vector<int> label_shape(1, batch_size_);
   batch->label_.Reshape(label_shape);
@@ -206,7 +206,7 @@ void DicDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
 
 
 
-INSTANTIATE_CLASS(DicDataLayer);
-REGISTER_LAYER_CLASS(DicData);
+INSTANTIATE_CLASS(TextDataLayer);
+REGISTER_LAYER_CLASS(TextData);
 
 }  // namespace caffe

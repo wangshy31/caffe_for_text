@@ -395,7 +395,7 @@ message LayerParameter {
   optional TileParameter tile_param = 138;
   optional WindowDataParameter window_data_param = 129;
   optional NlpDataParameter nlp_data_param = 147;
-  optional DicDataParameter dic_data_param = 148;
+  optional TextDataParameter text_data_param = 148;
   optional DictIndexDataParameter dictindex_data_param = 149;
   optional DictEmbedParameter dict_embed_param = 150;
   optional PermuteParameter permute_param = 151;
@@ -759,10 +759,10 @@ message NlpDataParameter {
   optional bool shuffle = 18 [default = true];
 }
 //add by wangshy 20171205
-message DicDataParameter {
+message TextDataParameter {
   optional string label_source = 1;
   optional string data_source = 2;
-  optional string dic_source = 3;
+  optional string dict_source = 3;
   optional uint32 batch_size = 4;
   optional uint32 channel = 5;
   optional uint32 num_words = 6;
